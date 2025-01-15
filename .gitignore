@@ -1,0 +1,5 @@
+# Ignore environment files
+.env
+
+# Ignore virtual environment or temporary directories
+bot-env/

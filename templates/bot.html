@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Bot</title>
+    <!-- Bootstrap CSS -->
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
+    <style>
+        /* Custom CSS */
+        .chat-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 350px;
+            max-width: 100%;
+            z-index: 1000;
+            font-family: Ubuntu, sans-serif;
+            
+        }
+
+        .chat-box {
+            display: none;
+            flex-direction: column;
+            height: 540px;
+            background: #fff;
+            border-radius: 10px;
+            border:1px solid #000080;
+            margin-bottom: 60px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .chat-header {
+            padding: 10px 10px 1px 10px;
+            background: #000080;
+            color: white;
+            font-family: Ubuntu, sans-serif;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+            
+            display: flex;
+            flex-direction: column; 
+            align-items: center;    
+            justify-content: center; 
+            text-align: center;     
+        }
+
+        .msg_card_body {
+            overflow-y: auto;
+            padding:0rem;
+            display: flex;
+            flex-direction: column-reverse; /* This will make the scroll appear at the top */
+            height: 400px;
+        }
+        
+        .msg_cotainer{
+            background:#f1efef;
+        }
+        .msg_cotainer_send{
+            background:#e1e0e0;
+        }
+        .msg_cotainer_send,
+        .msg_cotainer {
+            word-wrap: break-word;
+            max-width: 80%;
+            padding: 7px;
+            margin-bottom: 10px;
+            font-size: 12px;
+            border-radius: 10px;
+        }
+
+        .user_img,
+        .user_img_msg {
+            width: 25px;
+            height: 25px;
+            margin-right: 10px;
+            border: 1px solid #000080;
+            border-radius: 50%;
+        }
+        
+        .user_img_msg {
+            margin-left: 10px;
+        }
+
+        .msg_time_send,
+        .msg_time {
+            font-size: 12px;
+            font-weight: bold;
+            margin-top: 5px;
+            width:100%;
+            text-align: right;
+        }
+
+        .chat-toggle-btn {
+            position: absolute;
+            bottom: 0;
+            right: -10px; /* Adjusted to place outside the box */
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: #000080;
+            color: white;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .chat-toggle-btn.open {
+            transform: rotate(180deg); /* Rotate button when chat is open */
+        }
+    </style>
+</head>
+
+<body>
+    <div class="chat-container">
+        <div id="chatBox" class="chat-box">
+            <div class="chat-header">
+                <span>
+                    <!-- <b>HELPFUL BOT</b> -->
+                    <img src="static/bot-icon.png" alt="Bot Icon" style="width: 30px; height: 30px; vertical-align: middle; margin-right: 5px;">
+                    
+                </span>
+                <p><b>HELPFUL CHATBOT</b></p>
+            </div>
+            <div id="messageFormeight" class="card-body msg_card_body">
+                <!-- Messages will be appended here -->
+            </div>
+            <div class="card-footer">
+                <form id="messageArea" class="input-group">
+                    <input type="text" id="text" name="msg" placeholder="Type your message..." autocomplete="off" class="form-control type_msg" required />
+                    <div class="input-group-append">
+                        <button type="submit" id="send" class="input-group-text send_btn"><i class="fas fa-location-arrow"></i></button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <button id="chatToggleBtn" class="chat-toggle-btn"><i class="fas fa-chevron-up"></i></button>
+    </div>
+
+    <!-- jQuery -->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <!-- Bootstrap JS -->
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            $("#chatToggleBtn").on("click", function () {
+                $("#chatBox").slideToggle();
+                $(this).toggleClass("open");
+            });
+        
+            $("#messageArea").on("submit", function (event) {
+                event.preventDefault();
+        
+                /*const date = new Date();
+                const hour = date.getHours();
+                const minute = date.getMinutes();
+                const str_time = hour + ":" + minute;*/
+                const date = new Date();
+                let hour = date.getHours();
+                const minute = date.getMinutes().toString().padStart(2, '0');
+                const ampm = hour >= 12 ? 'PM' : 'AM';
+                hour = hour % 12 || 12; // Convert to 12-hour format
+                const str_time = hour + ":" + minute + " " + ampm;
+                const rawText = $("#text").val();
+        
+                const userHtml = '<div class="d-flex justify-content-end mb-2"><div class="msg_cotainer_send">' + rawText + '<br><div class="msg_time_send">' + str_time + '</div></div><div class="img_cont_msg"><img src="https://i.ibb.co/WGWnPXs/user-4302027.png" class="rounded-circle user_img_msg"></div></div>';
+
+                $("#text").val("");
+                $("#messageFormeight").prepend(userHtml); // Use prepend to add new messages at the top
+        
+                $.ajax({
+                    data: {
+                        msg: rawText,
+                    },
+                    type: "POST",
+                    url: "/ask",
+                }).done(function (data) {
+                    const botHtml = '<div class="d-flex justify-content-start mb-2"><div class="img_cont_msg"><img src="https://i.ibb.co/vPqBd04/bot-icon.png" class="rounded-circle user_img_msg"></div><div class="msg_cotainer">' + data.answer + '<br><div class="msg_time">' + str_time + '</div></div></div>';
+        
+                    $("#messageFormeight").prepend(botHtml); // Use prepend to add new messages at the top
+                });
+            });
+        });
+        
+    </script>
+</body>
+
+</html>
